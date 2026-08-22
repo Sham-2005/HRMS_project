@@ -6,7 +6,7 @@ from app.api import (
     auth,
     employees,
     attendance,
-    leaves,
+    leaves, 
     payroll,
     notifications,
     analytics,
