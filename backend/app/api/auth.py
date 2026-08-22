@@ -6,7 +6,8 @@ from app.models import models
 from app.schemas import schemas
 from app.core import security
 from app.api import deps
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
+import re
 
 router = APIRouter()
 
@@ -17,6 +18,23 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     role: str = "EMPLOYEE"  # ADMIN, HR, EMPLOYEE
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v) < 12:
+            raise ValueError("Password must contain at least 12 characters.")
+        if len(v) > 72:
+            raise ValueError("Password must be at most 72 characters long.")
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Password must contain an uppercase letter.")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("Password must contain a lowercase letter.")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must contain a number.")
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
+            raise ValueError("Password must contain a special character.")
+        return v
 
 @router.post("/register", response_model=schemas.UserResponse)
 def register(user_in: UserRegister, db: Session = Depends(get_db)):
@@ -78,12 +96,30 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
 @router.post("/login", response_model=schemas.Token)
 def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == login_data.email).first()
-    if not user or not security.verify_password(login_data.password, user.hashed_password):
+    if not user:
+        # Run dummy verify to protect against timing attacks
+        security.verify_password(login_data.password, security.DUMMY_HASH)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    is_plaintext = not security.is_bcrypt_hash(user.hashed_password)
+    
+    if not security.verify_password(login_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    if is_plaintext:
+        # Automatically migrate the plaintext password to a secure hash
+        user.hashed_password = security.get_password_hash(login_data.password)
+        db.commit()
+        db.refresh(user)
+        
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -99,12 +135,36 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
 @router.post("/login-form", response_model=schemas.Token)
 def login_form(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
+    if not user:
+        # Run dummy verify to protect against timing attacks
+        security.verify_password(form_data.password, security.DUMMY_HASH)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+        
+    is_plaintext = not security.is_bcrypt_hash(user.hashed_password)
+    
+    if not security.verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    if is_plaintext:
+        # Automatically migrate the plaintext password to a secure hash
+        user.hashed_password = security.get_password_hash(form_data.password)
+        db.commit()
+        db.refresh(user)
+        
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
+        
     access_token = security.create_access_token(
         subject=user.email, role=user.role
     )

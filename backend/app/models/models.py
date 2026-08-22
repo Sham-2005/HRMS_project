@@ -11,8 +11,44 @@ from sqlalchemy import (
     ForeignKey,
     Index,
 )
+from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import relationship
 from app.database import Base
+from app.core.encryption import encrypt_string, decrypt_string
+
+class EncryptedString(TypeDecorator):
+    """Transparently encrypts and decrypts strings using AES-256-GCM."""
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return encrypt_string(str(value))
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return decrypt_string(value)
+
+class EncryptedFloat(TypeDecorator):
+    """Transparently encrypts and decrypts float values using AES-256-GCM."""
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return encrypt_string(str(value))
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        dec = decrypt_string(value)
+        try:
+            return float(dec)
+        except ValueError:
+            return 0.0
 
 class User(Base):
     __tablename__ = "users"
@@ -37,18 +73,18 @@ class Employee(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
-    phone = Column(String, nullable=True)
-    address = Column(String, nullable=True)
+    phone = Column(EncryptedString, nullable=True)
+    address = Column(EncryptedString, nullable=True)
     profile_picture = Column(String, nullable=True)
     department = Column(String, nullable=True)
     designation = Column(String, nullable=True)
     joining_date = Column(Date, default=datetime.date.today)
     
     # Salary Structure (Current)
-    base_salary = Column(Float, default=0.0)
-    allowances = Column(Float, default=0.0)
-    deductions = Column(Float, default=0.0)
-    net_salary = Column(Float, default=0.0)
+    base_salary = Column(EncryptedFloat, default=0.0)
+    allowances = Column(EncryptedFloat, default=0.0)
+    deductions = Column(EncryptedFloat, default=0.0)
+    net_salary = Column(EncryptedFloat, default=0.0)
     
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -100,10 +136,10 @@ class Payroll(Base):
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), index=True, nullable=False)
     month = Column(String, nullable=False)  # YYYY-MM
-    base_salary = Column(Float, nullable=False)
-    allowances = Column(Float, nullable=False)
-    deductions = Column(Float, nullable=False)
-    net_salary = Column(Float, nullable=False)
+    base_salary = Column(EncryptedFloat, nullable=False)
+    allowances = Column(EncryptedFloat, nullable=False)
+    deductions = Column(EncryptedFloat, nullable=False)
+    net_salary = Column(EncryptedFloat, nullable=False)
     status = Column(String, nullable=False, default="UNPAID")  # PAID, UNPAID
     processed_date = Column(Date, nullable=True)
     transaction_id = Column(String, nullable=True)

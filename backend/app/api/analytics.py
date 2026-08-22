@@ -217,3 +217,127 @@ def get_employee_analytics(
         "today_status": today_status,
         "latest_payroll": payroll_info
     }
+
+
+@router.get("/dataset-records")
+def get_dataset_records(
+    current_user: models.User = Depends(deps.RoleChecker(["ADMIN", "HR"])),
+    db: Session = Depends(get_db)
+):
+    # 1. Employees (with masked/filtered data for presentation)
+    employees = db.query(models.Employee).all()
+    emp_data = []
+    for e in employees:
+        emp_data.append({
+            "id": e.id,
+            "employee_id": e.employee_id,
+            "name": f"{e.first_name} {e.last_name}",
+            "email": e.email,
+            "department": e.department or "N/A",
+            "designation": e.designation or "N/A",
+            "joining_date": str(e.joining_date) if e.joining_date else "N/A",
+            "base_salary": e.base_salary,
+            "allowances": e.allowances,
+            "deductions": e.deductions,
+            "net_salary": e.net_salary,
+            "phone": e.phone[:6] + "XXXX" if e.phone else "N/A",
+            "address": e.address[:10] + "..." if e.address else "N/A"
+        })
+
+    # 2. Attendance
+    attendance = db.query(models.Attendance).all()
+    att_data = []
+    for a in attendance:
+        att_data.append({
+            "id": a.id,
+            "employee_id": a.employee.employee_id if a.employee else "N/A",
+            "employee_name": f"{a.employee.first_name} {a.employee.last_name}" if a.employee else "N/A",
+            "date": str(a.date),
+            "check_in": a.check_in.strftime("%H:%M:%S") if a.check_in else "N/A",
+            "check_out": a.check_out.strftime("%H:%M:%S") if a.check_out else "N/A",
+            "status": a.status,
+            "work_hours": a.work_hours
+        })
+
+    # 3. Leaves
+    leaves = db.query(models.LeaveRequest).all()
+    leave_data = []
+    for l in leaves:
+        leave_data.append({
+            "id": l.id,
+            "employee_id": l.employee.employee_id if l.employee else "N/A",
+            "employee_name": f"{l.employee.first_name} {l.employee.last_name}" if l.employee else "N/A",
+            "leave_type": l.leave_type,
+            "start_date": str(l.start_date),
+            "end_date": str(l.end_date),
+            "status": l.status,
+            "reason": l.reason,
+            "admin_comments": l.admin_comments or "N/A"
+        })
+
+    # 4. Payroll
+    payrolls = db.query(models.Payroll).all()
+    payroll_data = []
+    for p in payrolls:
+        payroll_data.append({
+            "id": p.id,
+            "employee_id": p.employee.employee_id if p.employee else "N/A",
+            "employee_name": f"{p.employee.first_name} {p.employee.last_name}" if p.employee else "N/A",
+            "month": p.month,
+            "base_salary": p.base_salary,
+            "allowances": p.allowances,
+            "deductions": p.deductions,
+            "net_salary": p.net_salary,
+            "status": p.status,
+            "processed_date": str(p.processed_date) if p.processed_date else "N/A",
+            "transaction_id": p.transaction_id or "N/A"
+        })
+
+    # 5. Notifications
+    notifications = db.query(models.Notification).all()
+    notif_data = []
+    for n in notifications:
+        notif_data.append({
+            "id": n.id,
+            "employee_id": n.employee.employee_id if n.employee else "N/A",
+            "employee_name": f"{n.employee.first_name} {n.employee.last_name}" if n.employee else "N/A",
+            "title": n.title,
+            "message": n.message,
+            "is_read": "Read" if n.is_read else "Unread",
+            "created_at": n.created_at.strftime("%Y-%m-%d %H:%M:%S") if n.created_at else "N/A"
+        })
+
+    # 6. Audit Logs
+    audit_logs = db.query(models.AuditLog).all()
+    audit_data = []
+    for log in audit_logs:
+        audit_data.append({
+            "id": log.id,
+            "user_email": log.user.email if log.user else "System",
+            "action": log.action,
+            "details": log.details,
+            "timestamp": log.timestamp.strftime("%Y-%m-%d %H:%M:%S") if log.timestamp else "N/A"
+        })
+
+    total_records = len(emp_data) + len(att_data) + len(leave_data) + len(payroll_data) + len(notif_data) + len(audit_data)
+
+    return {
+        "stats": {
+            "total_records": total_records,
+            "employees_count": len(emp_data),
+            "attendance_count": len(att_data),
+            "leaves_count": len(leave_data),
+            "payroll_count": len(payroll_data),
+            "notifications_count": len(notif_data),
+            "audit_logs_count": len(audit_data)
+        },
+        "records": {
+            "employees": emp_data,
+            "attendance": att_data,
+            "leaves": leave_data,
+            "payroll": payroll_data,
+            "notifications": notif_data,
+            "audit_logs": audit_data
+        }
+    }
+

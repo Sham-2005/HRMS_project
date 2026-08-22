@@ -13,6 +13,7 @@ export const MainLayout = () => {
     if (path.startsWith('/leaves')) return 'Leave Management';
     if (path.startsWith('/payroll')) return 'Payroll & Compensation';
     if (path.startsWith('/reports')) return 'Analytics Reports';
+    if (path.startsWith('/dataset')) return 'Dataset Explorer';
     if (path.startsWith('/profile')) return 'My Profile';
     return 'Dayflow HRMS';
   };

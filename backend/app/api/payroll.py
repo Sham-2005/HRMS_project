@@ -97,11 +97,10 @@ def update_salary_structure(
     employee.net_salary = new_net
     employee.updated_at = datetime.utcnow()
     
-    # Audit log entry
+    # Audit log entry (Redacted specific monetary values to prevent PII/financial leakage in audit logs)
     audit_details = (
-        f"Updated salary for employee {employee.first_name} {employee.last_name} (ID: {employee.employee_id}). "
-        f"Old: Base={old_base}, Allow={old_allowances}, Ded={old_deductions}, Net={old_net}. "
-        f"New: Base={new_base}, Allow={new_allowances}, Ded={new_deductions}, Net={new_net}."
+        f"Updated salary structure for employee {employee.first_name} {employee.last_name} (ID: {employee.employee_id}). "
+        f"Old values: [REDACTED], New values: [REDACTED]."
     )
     db_audit = models.AuditLog(
         user_id=current_user.id,

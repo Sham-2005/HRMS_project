@@ -14,6 +14,7 @@ import Leaves from './pages/Leaves';
 import Payroll from './pages/Payroll';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
+import Dataset from './pages/Dataset';
 
 export const App = () => {
   return (
@@ -58,6 +59,15 @@ export const App = () => {
             element={
               <ProtectedRoute allowedRoles={['ADMIN', 'HR']}>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="dataset"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR']}>
+                <Dataset />
               </ProtectedRoute>
             }
           />

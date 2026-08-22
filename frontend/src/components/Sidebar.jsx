@@ -14,6 +14,7 @@ import {
   X,
   Lock,
   Layers,
+  Database,
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -29,6 +30,7 @@ export const Sidebar = () => {
     { name: 'Leaves', path: '/leaves', icon: CalendarDays, roles: ['ADMIN', 'HR', 'EMPLOYEE'] },
     { name: 'Payroll', path: '/payroll', icon: CreditCard, roles: ['ADMIN', 'HR', 'EMPLOYEE'] },
     { name: 'Reports', path: '/reports', icon: FileText, roles: ['ADMIN', 'HR'] },
+    { name: 'Dataset', path: '/dataset', icon: Database, roles: ['ADMIN', 'HR'] },
     { name: 'Profile', path: '/profile', icon: User, roles: ['ADMIN', 'HR', 'EMPLOYEE'] },
   ];
 

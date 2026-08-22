@@ -12,9 +12,37 @@ const registerSchema = zod.object({
   first_name: zod.string().min(2, 'First name is too short'),
   last_name: zod.string().min(1, 'Last name is required'),
   email: zod.string().email('Please enter a valid email address'),
-  password: zod.string().min(6, 'Password must be at least 6 characters long'),
+  password: zod.string()
+    .min(12, 'Password must contain at least 12 characters.')
+    .max(72, 'Password must be at most 72 characters long.')
+    .refine((val) => /[A-Z]/.test(val), { message: 'Password must contain an uppercase letter.' })
+    .refine((val) => /[a-z]/.test(val), { message: 'Password must contain a lowercase letter.' })
+    .refine((val) => /\d/.test(val), { message: 'Password must contain a number.' })
+    .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), { message: 'Password must contain a special character.' }),
+  confirmPassword: zod.string(),
   role: zod.string().default('EMPLOYEE'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
 });
+
+const calculatePasswordStrength = (pwd) => {
+  if (!pwd) return { score: 0, label: '', color: 'bg-slate-800', textColor: 'text-slate-400' };
+  let score = 0;
+  if (pwd.length >= 12) score += 1;
+  if (/[A-Z]/.test(pwd)) score += 1;
+  if (/[a-z]/.test(pwd)) score += 1;
+  if (/\d/.test(pwd)) score += 1;
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score += 1;
+
+  if (score <= 2) {
+    return { score, label: 'Weak', color: 'bg-rose-500', textColor: 'text-rose-400' };
+  } else if (score <= 4) {
+    return { score, label: 'Medium', color: 'bg-amber-500', textColor: 'text-amber-400' };
+  } else {
+    return { score, label: 'Strong', color: 'bg-emerald-500', textColor: 'text-emerald-400' };
+  }
+};
 
 export const Register = () => {
   const { register: registerUser } = useAuth();
@@ -24,6 +52,7 @@ export const Register = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(registerSchema),
@@ -33,13 +62,17 @@ export const Register = () => {
       last_name: '',
       email: '',
       password: '',
+      confirmPassword: '',
       role: 'EMPLOYEE',
     },
   });
 
+  const passwordVal = watch('password', '');
+
   const onSubmit = async (data) => {
     try {
-      await registerUser(data);
+      const { confirmPassword, ...submitData } = data;
+      await registerUser(submitData);
       setToastMessage({ type: 'success', text: 'Registration successful! Redirecting to login...' });
       setTimeout(() => {
         navigate('/login');
@@ -124,6 +157,36 @@ export const Register = () => {
               placeholder="••••••••"
               error={errors.password?.message}
               {...register('password')}
+            />
+
+            {passwordVal && (
+              <div className="mt-2 space-y-1.5 p-3 rounded-lg bg-slate-900/55 border border-slate-800/80">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400">Password Strength:</span>
+                  <span className={`font-bold ${calculatePasswordStrength(passwordVal).textColor}`}>
+                    {calculatePasswordStrength(passwordVal).label}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden flex">
+                  <div className={`h-full rounded-full transition-all duration-300 ${calculatePasswordStrength(passwordVal).color}`} style={{ width: `${(calculatePasswordStrength(passwordVal).score / 5) * 100}%` }}></div>
+                </div>
+                <ul className="text-[10px] text-slate-500 space-y-0.5 mt-1 list-disc pl-4">
+                  <li className={passwordVal.length >= 12 ? 'text-emerald-500 font-medium' : ''}>At least 12 characters</li>
+                  <li className={/[A-Z]/.test(passwordVal) ? 'text-emerald-500 font-medium' : ''}>At least one uppercase letter</li>
+                  <li className={/[a-z]/.test(passwordVal) ? 'text-emerald-500 font-medium' : ''}>At least one lowercase letter</li>
+                  <li className={/\d/.test(passwordVal) ? 'text-emerald-500 font-medium' : ''}>At least one number</li>
+                  <li className={/[!@#$%^&*(),.?":{}|<>]/.test(passwordVal) ? 'text-emerald-500 font-medium' : ''}>At least one special character</li>
+                </ul>
+              </div>
+            )}
+
+            <Input
+              id="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              placeholder="••••••••"
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword')}
             />
 
             <Button

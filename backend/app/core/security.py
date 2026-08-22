@@ -4,10 +4,23 @@ from jose import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
 
+import hmac
+
 # Setup password context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Pre-computed dummy bcrypt hash for timing attack protection on non-existent users
+DUMMY_HASH = "$2b$12$LqyqyqyqyqyqyqyqyqyqyeXoD.gC5i66lE6P.g633p2.gC5i66lE6"
+
+def is_bcrypt_hash(value: str) -> bool:
+    if not value:
+        return False
+    return len(value) == 60 and (value.startswith("$2a$") or value.startswith("$2b$") or value.startswith("$2y$"))
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    if not is_bcrypt_hash(hashed_password):
+        # Fallback to constant-time comparison for legacy plaintext passwords to allow migration
+        return hmac.compare_digest(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password: str) -> str:
