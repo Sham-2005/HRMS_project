@@ -110,18 +110,17 @@ export const Reports = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <button
           onClick={() => { setReportType('attendance'); setStartDate(''); setEndDate(''); }}
-          className={`text-left transition-all ${
-            reportType === 'attendance'
+          className={`text-left transition-all ${reportType === 'attendance'
               ? 'ring-2 ring-indigo-500 scale-[1.01]'
               : 'hover:scale-[1.01]'
-          }`}
+            }`}
         >
           <Card className="flex items-center space-x-4 p-5">
             <div className="p-3 bg-indigo-500/10 rounded-xl">
               <Clock className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-200">Attendance Report</h4>
+              <h4 className="text-sm font-bold text-slate-200">Attendance Report </h4>
               <p className="text-xs text-slate-500 mt-0.5">Logs of employee shifts & check-ins</p>
             </div>
           </Card>
@@ -129,11 +128,10 @@ export const Reports = () => {
 
         <button
           onClick={() => { setReportType('leaves'); setStartDate(''); setEndDate(''); }}
-          className={`text-left transition-all ${
-            reportType === 'leaves'
+          className={`text-left transition-all ${reportType === 'leaves'
               ? 'ring-2 ring-indigo-500 scale-[1.01]'
               : 'hover:scale-[1.01]'
-          }`}
+            }`}
         >
           <Card className="flex items-center space-x-4 p-5">
             <div className="p-3 bg-amber-500/10 rounded-xl">
@@ -148,11 +146,10 @@ export const Reports = () => {
 
         <button
           onClick={() => { setReportType('payroll'); setMonth(''); }}
-          className={`text-left transition-all ${
-            reportType === 'payroll'
+          className={`text-left transition-all ${reportType === 'payroll'
               ? 'ring-2 ring-indigo-500 scale-[1.01]'
               : 'hover:scale-[1.01]'
-          }`}
+            }`}
         >
           <Card className="flex items-center space-x-4 p-5">
             <div className="p-3 bg-emerald-500/10 rounded-xl">

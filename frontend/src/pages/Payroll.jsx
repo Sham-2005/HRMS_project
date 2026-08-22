@@ -39,7 +39,7 @@ export const Payroll = () => {
   // Admin states
   const [isProcessOpen, setIsProcessOpen] = useState(false);
   const [processMonth, setProcessMonth] = useState('');
-  
+
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [isSalaryOpen, setIsSalaryOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -152,25 +152,22 @@ export const Payroll = () => {
           <div className="flex space-x-2">
             <button
               onClick={() => { setActiveTab('payouts'); setSearch(''); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                activeTab === 'payouts' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${activeTab === 'payouts' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               Processed Payouts
             </button>
             <button
               onClick={() => { setActiveTab('structures'); setSearch(''); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                activeTab === 'structures' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${activeTab === 'structures' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               Salary Structures
             </button>
             <button
               onClick={() => { setActiveTab('me'); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                activeTab === 'me' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${activeTab === 'me' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               My Statements
             </button>
@@ -294,7 +291,7 @@ export const Payroll = () => {
                 className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
               />
             </div>
-            
+
             <input
               type="month"
               placeholder="Filter by month"
@@ -463,7 +460,7 @@ export const Payroll = () => {
       >
         <div className="space-y-4">
           <p className="text-xs text-slate-400 leading-relaxed">
-            Running payroll will create statements for all active employees for the selected month using their current salary structures. 
+            Running payroll will create statements for all active employees for the selected month using their current salary structures.
             Slips will be marked as <Badge variant="success">PAID</Badge> automatically.
           </p>
           <div>

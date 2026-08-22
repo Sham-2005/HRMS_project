@@ -34,7 +34,7 @@ export const Leaves = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [toast, setToast] = useState(null);
-  
+
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR';
 
   // State for admin action
@@ -174,11 +174,10 @@ export const Leaves = () => {
               <button
                 key={status}
                 onClick={() => setAdminFilter(status)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                  adminFilter === status
+                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all ${adminFilter === status
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-850'
-                }`}
+                  }`}
               >
                 {status || 'All requests'}
               </button>
@@ -243,7 +242,7 @@ export const Leaves = () => {
                       </p>
                     </td>
                     <td className="py-4 px-6">{getStatusBadge(row.status)}</td>
-                    
+
                     {isAdminOrHR ? (
                       adminFilter === 'PENDING' && row.status === 'PENDING' && (
                         <td className="py-4 px-6 text-right">
@@ -331,9 +330,8 @@ export const Leaves = () => {
               id="reason"
               placeholder="Provide a detailed reason for leave..."
               rows="3"
-              className={`w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all text-sm ${
-                errors.reason ? 'border-rose-500' : ''
-              }`}
+              className={`w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all text-sm ${errors.reason ? 'border-rose-500' : ''
+                }`}
               {...register('reason')}
             />
             {errors.reason && <p className="mt-1.5 text-xs text-rose-400 font-medium">{errors.reason.message}</p>}
@@ -384,7 +382,7 @@ export const Leaves = () => {
             </span>{' '}
             ({activeRequest?.leave_type} leave from {activeRequest?.start_date} to {activeRequest?.end_date}).
           </p>
-          
+
           <div>
             <label htmlFor="comments" className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
               Admin Comments / Feedback
