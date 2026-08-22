@@ -135,8 +135,8 @@ export const Attendance = () => {
           </div>
 
           <div className="text-xs text-slate-400 space-y-1">
-            <p>Check-In time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_in_time || '—'}</span></p>
-            <p>Check-Out time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_out_time || '—'}</span></p>
+            <p>Check -In time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_in_time || '—'}</span></p>
+            <p>Check -Out time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_out_time || '—'}</span></p>
           </div>
 
           <div className="flex space-x-3 md:justify-end">
@@ -176,7 +176,7 @@ export const Attendance = () => {
                 className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
               />
             </div>
-            
+
             {/* Status Filter */}
             <div className="flex items-center space-x-2">
               <Filter className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
