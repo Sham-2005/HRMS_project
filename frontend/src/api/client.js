@@ -1,5 +1,9 @@
 const getBaseUrl = () => {
-  let url = import.meta.env.VITE_API_URL || '';
+  let url = import.meta.env.VITE_API_URL;
+  if (!url && import.meta.env.PROD) {
+    url = 'https://dayflow-hrms-api-vz3t.onrender.com';
+  }
+  url = url || '';
   if (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
