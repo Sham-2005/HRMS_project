@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import apiClient from '../api/client';
+
+//importing nessacery components from the UI library
 import { Card, Button, Badge, Toast, Skeleton } from '../components/UI';
 import {
   AreaChart,
@@ -167,7 +169,7 @@ export const Dashboard = () => {
           <Card className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">Attendance trend</h4>
+                <h4 className="text-sm font-bold text-slate-200">Attendance trends</h4>
                 <p className="text-xs text-slate-500 mt-0.5">Headcount records for the past 7 days</p>
               </div>
               <TrendingUp className="w-5 h-5 text-indigo-400" />
@@ -177,8 +179,8 @@ export const Dashboard = () => {
                 <AreaChart data={attendance_trend}>
                   <defs>
                     <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="date" stroke="#475569" fontSize={11} tickLine={false} />
@@ -312,8 +314,8 @@ export const Dashboard = () => {
                 <span className="text-slate-400">Today's Status:</span>
                 <Badge variant={
                   today_status?.status === 'PRESENT' ? 'success' :
-                  today_status?.status === 'HALF_DAY' ? 'warning' :
-                  today_status?.status === 'LEAVE' ? 'info' : 'danger'
+                    today_status?.status === 'HALF_DAY' ? 'warning' :
+                      today_status?.status === 'LEAVE' ? 'info' : 'danger'
                 }>
                   {today_status?.status || 'No status'}
                 </Badge>
