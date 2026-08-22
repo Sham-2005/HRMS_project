@@ -135,8 +135,8 @@ export const Attendance = () => {
           </div>
 
           <div className="text-xs text-slate-400 space-y-1">
-            <p>Check -In time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_in_time || '—'}</span></p>
-            <p>Check -Out time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_out_time || '—'}</span></p>
+            <p>Check-In time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_in_time || '—'}</span></p>
+            <p>Check-Out time: <span className="text-slate-200 font-semibold">{empData?.today_status?.check_out_time || '—'}</span></p>
           </div>
 
           <div className="flex space-x-3 md:justify-end">
