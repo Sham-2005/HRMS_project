@@ -30,11 +30,14 @@ export const AuthProvider = ({ children }) => {
     queryFn: () => apiClient.get('/api/auth/me'),
     enabled: !!token,
     retry: false,
-    onError: () => {
-      // Clear token if token is invalid or expired
+  });
+
+  // Clear token if token is invalid or expired
+  useEffect(() => {
+    if (error) {
       logout();
     }
-  });
+  }, [error]);
 
   // Login Mutation
   const loginMutation = useMutation({
@@ -46,7 +49,9 @@ export const AuthProvider = ({ children }) => {
       queryClient.setQueryData(['auth_user'], null);
       // Wait for refetch to complete before navigating
       refetch().then((res) => {
-        navigate('/dashboard');
+        if (res.data) {
+          navigate('/dashboard');
+        }
       });
     },
   });

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { useAuth } from '../hooks/useAuth';
 import { useMutation } from '@tanstack/react-query';
-import apiClient from '../api/client';
+import apiClient, { getAbsoluteUrl } from '../api/client';
 import { Card, Button, Input, Toast } from '../components/UI';
 import { User, Phone, MapPin, Briefcase, DollarSign, Calendar, Upload, Loader2 } from 'lucide-react';
 
@@ -77,7 +77,7 @@ export const Profile = () => {
           <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center relative">
             {emp?.profile_picture ? (
               <img
-                src={emp.profile_picture}
+                src={getAbsoluteUrl(emp.profile_picture)}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />

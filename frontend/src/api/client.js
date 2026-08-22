@@ -1,3 +1,18 @@
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || '';
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  return url;
+};
+
+export const getAbsoluteUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const baseUrl = getBaseUrl();
+  return `${baseUrl}${path}`;
+};
+
 const client = async (endpoint, { body, ...customConfig } = {}) => {
   const token = localStorage.getItem('dayflow_token');
   const headers = {};
@@ -8,7 +23,8 @@ const client = async (endpoint, { body, ...customConfig } = {}) => {
     headers['Content-Type'] = 'application/json';
   }
 
-  if (token) {
+  const isAuthRoute = endpoint.includes('/auth/login') || endpoint.includes('/auth/register');
+  if (token && !isAuthRoute) {
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -26,10 +42,17 @@ const client = async (endpoint, { body, ...customConfig } = {}) => {
   }
 
   try {
-    const response = await fetch(endpoint, config);
+    const response = await fetch(getAbsoluteUrl(endpoint), config);
 
     // 401 Unauthorized handling
     if (response.status === 401) {
+      if (endpoint.includes('/auth/login')) {
+        const errorData = await response.json().catch(() => ({}));
+        const error = new Error(errorData.detail || 'Incorrect email or password.');
+        error.status = response.status;
+        return Promise.reject(error);
+      }
+
       localStorage.removeItem('dayflow_token');
       // Only redirect if we are not already on the login page
       if (!window.location.pathname.includes('/login')) {

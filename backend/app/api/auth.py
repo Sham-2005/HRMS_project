@@ -96,6 +96,8 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
 @router.post("/login", response_model=schemas.Token)
 def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == login_data.email).first()
+    print(f"[LOGIN ATTEMPT] email={login_data.email} user_found={user is not None}", flush=True)
+    
     if not user:
         # Run dummy verify to protect against timing attacks
         security.verify_password(login_data.password, security.DUMMY_HASH)
@@ -107,7 +109,10 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
     
     is_plaintext = not security.is_bcrypt_hash(user.hashed_password)
     
-    if not security.verify_password(login_data.password, user.hashed_password):
+    pwd_verified = security.verify_password(login_data.password, user.hashed_password)
+    print(f"[PASSWORD VERIFICATION] email={login_data.email} success={pwd_verified}", flush=True)
+    
+    if not pwd_verified:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

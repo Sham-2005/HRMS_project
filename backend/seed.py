@@ -9,9 +9,10 @@ from app.database import engine, SessionLocal, Base
 from app.models import models
 from app.core import security
 
-def seed_db():
-    print("Re-creating database tables...")
-    Base.metadata.drop_all(bind=engine)
+def seed_db(drop_tables: bool = True):
+    if drop_tables:
+        print("Re-creating database tables...")
+        Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
